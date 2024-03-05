@@ -1,0 +1,29 @@
+---
+- name: Download package
+  ansible.builtin.get_url:
+    url: https://github.com/grafana/tempo/releases/download/v"{{ grafana_tempo_version }}"/tempo_"{{ grafana_tempo_version }}"_linux_amd64.deb
+    checksum: sha256:19a2134e2a2880c3d04e140fb536a6565cfe37701135c74b36cacc156caf356f
+    decompress: false
+    dest: /tmp/pkg/tempo.deb
+    mode: 644
+
+- name: Install package
+  ansible.builtin.apt:
+    deb: /tmp/pkg/tempo.deb
+    state: "present"
+    allow_downgrade: true
+  
+- name: Configure
+  ansible.builtin.template:
+    src: templates/tempo_config.yml.j2
+    dest: /etc/tempo/config.yml
+    mode: 600
+    owner: tempo
+    group: nogroup
+
+- name: Start service
+  ansible.builtin.systemd:
+    daemon-reload: yes
+    enabled: true
+    state: started
+    name: tempo.service

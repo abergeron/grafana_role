@@ -1,0 +1,19 @@
+server:
+  http_listen_port: {{ grafana_tempo_http_port }}
+
+distributor:
+  receivers:
+    otlp:
+      protocols:
+        grpc:
+        http:
+
+compacter:
+  compaction:
+    block_retention: {{ grafana_tempo_block_retention }}
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: {{ grafana_tempo_local_path }}
