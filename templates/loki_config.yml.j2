@@ -1,0 +1,33 @@
+auth_enabled: false
+
+server:
+  http_listen_port: {{ grafana_loki_http_port }}
+  http_tls_config:
+    cert_file: /etc/loki/cert.file
+    key_file: /etc/loki/cert.key
+
+  grpc_listen_port: {{ grafana_loki_grpc_port }}
+  grpc_tls_config:
+    cert_file: /etc/loki/cert.file
+    key_file: /etc/loki/cert.key
+
+common:
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+  replication_factor: 1
+
+storage_config:
+  filesystem:
+    directory: {{ grafana_loki_local_path }}
+
+schema_config:
+  configs:
+    - from: 2024-03-01
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v12
+      index:
+        prefix: index_
+        period: 24h

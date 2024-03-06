@@ -1,0 +1,50 @@
+---
+- ansible.builtin.import_tasks: setup_repo.yml
+
+- name: Install package
+  ansible.builtin.apt:
+    name: "loki={{ grafana_loki_version }}"
+    state: "present"
+    allow_downgrade: true
+
+- name: Install certificate key
+  ansible.builtin.copy:
+    mode: '0600'
+    owner: loki
+    group: nogroup
+    dest: /etc/loki/cert.key
+    content: "{{ grafana_loki_cert_key }}"
+  when: grafana_loki_cert_key is defined
+
+- name Install certificate file
+  ansible.builtin.copy:
+    mode: '0600'
+    owner: loki
+    group: nogroup
+    dest: /etc/loki/cert.file
+    content: "{{ grafana_loki_cert_file | mandatory }}"
+  when: grafana_loki_cert_key is defined
+
+- name: Generate certificate
+  ansible.builtin.include_tasks: generate_certs.yml
+  vars:
+    cert_key_path: /etc/loki/cert.key
+    cert_file_path: /etc/loki/cert.file
+    cert_owner: loki
+    cert_group: nogroup
+  when: grafana_loki_cert_key is undefined
+
+- name: Configure
+  ansible.builtin.template:
+    src: templates/loki_config.yml.j2
+    dest: /etc/loki/config.yml
+    mode: '0600'
+    owner: loki
+    group: nogroup
+
+- name: Start service
+  ansible.builtin.systemd:
+    daemon-reload: yes
+    enabled: true
+    state: started
+    name: loki.service
