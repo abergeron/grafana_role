@@ -1,18 +1,39 @@
 ---
-- name: Download package
-  ansible.builtin.get_url:
-    url: https://github.com/grafana/tempo/releases/download/v"{{ grafana_tempo_version }}"/tempo_"{{ grafana_tempo_version }}"_linux_amd64.deb
-    checksum: sha256:19a2134e2a2880c3d04e140fb536a6565cfe37701135c74b36cacc156caf356f
-    decompress: false
-    dest: /tmp/pkg/tempo.deb
-    mode: 644
+- import_tasks: setup_repo.yml
 
 - name: Install package
   ansible.builtin.apt:
-    deb: /tmp/pkg/tempo.deb
+    name: "tempo={{ grafana_tempo_version }}"
     state: "present"
     allow_downgrade: true
   
+- name: Install certificate key
+  ansible.builtin.copy:
+    mode: '0600'
+    owner: tempo
+    group: nogroup
+    dest: /etc/tempo/cert.key
+    content: "{{ grafana_tempo_cert_key }}"
+  when: grafana_tempo_cert_key is defined
+
+- name Install certificate file
+  ansible.builtin.copy:
+    mode: '0600'
+    owner: tempo
+    group: nogroup
+    dest: /etc/tempo/cert.file
+    content: "{{ grafana_tempo_cert_file | mandatory }}"
+  when: grafana_tempo_cert_key is defined
+
+- name: Generate certificate
+  ansible.builtin.include_tasks: generate_certs.yml
+  vars:
+    cert_key_path: /etc/tempo/cert.key
+    cert_file_path: /etc/tempo/cert.file
+    cert_owner: tempo
+    cert_group: nogroup
+  when: grafana_tempo_cert_key is undefined
+
 - name: Configure
   ansible.builtin.template:
     src: templates/tempo_config.yml.j2

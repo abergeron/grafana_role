@@ -1,0 +1,19 @@
+---
+- name: Generate private key
+  community.crypto.openssl_privatekey:
+    path: "{{ cert_key_path | mandatory }}"
+    mode: '0600'
+    owner: "{{ cert_owner | mandatory }}"
+    group: "{{ cert_group | mandatory }}"
+    type: "RSA"
+    size: 4096
+
+- name: Generate certificate
+  community.crypto.x509_certificate:
+    path: "{{ cert_file_path | mandatory }}"
+    privatekey_path: "{{ cert_key_path | mandatory }}"
+    provider: selfsigned
+    mode: '0600'
+    owner: "{{ cert_owner | mandatory }}"
+    group: "{{ cert_group | mandatory }}"
+    selfsigned_not_after: "+{{ cert_duration | default('60') }}d"

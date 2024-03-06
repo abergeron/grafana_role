@@ -1,5 +1,13 @@
 server:
   http_listen_port: {{ grafana_tempo_http_port }}
+  http_tls_config:
+    cert_file: /etc/tempo/cert.file
+    cert_key: /etc/tempo/cert.key
+
+  grpc_listen_port: {{ grafana_tempo_grpc_port }}
+  grpc_tls_config:
+    cert_file: /etc/tempo/cert.file
+    cert_key: /etc/tempo/cert.key
 
 distributor:
   receivers:

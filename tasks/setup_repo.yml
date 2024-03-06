@@ -1,0 +1,21 @@
+---
+- name: Ensure keyring directory is present
+  ansible.builtin.file:
+    mode: '0755'
+    group: root
+    owner: root
+    path: /etc/apt/keyrings
+    state: directory
+
+- name: Install gpg key
+  ansible.builtin.get_url:
+    url: https://apt.grafana.com/gpg.key
+    dest: /etc/apt/keyrings/grafana.asc
+    mode: '0644'
+    force: true
+
+- name: Setup Grafana repo
+  ansible.builtin.apt_repository:
+    filename: grafana
+    repo: "deb [signed-by=/etc/apt/keyrings/grafana.asc] https://apt.grafana.com stable main"
+    state: present
