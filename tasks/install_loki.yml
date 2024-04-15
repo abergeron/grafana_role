@@ -16,7 +16,7 @@
     content: "{{ grafana_loki_cert_key }}"
   when: grafana_loki_cert_key is defined
 
-- name Install certificate file
+- name: Install certificate file
   ansible.builtin.copy:
     mode: '0600'
     owner: loki
@@ -26,7 +26,7 @@
   when: grafana_loki_cert_key is defined
 
 - name: Generate certificate
-  ansible.builtin.include_tasks: generate_certs.yml
+  ansible.builtin.include_tasks: generate_cert.yml
   vars:
     cert_key_path: /etc/loki/cert.key
     cert_file_path: /etc/loki/cert.file
@@ -44,7 +44,7 @@
 
 - name: Start service
   ansible.builtin.systemd:
-    daemon-reload: yes
+    daemon-reload: true
     enabled: true
     state: started
     name: loki.service

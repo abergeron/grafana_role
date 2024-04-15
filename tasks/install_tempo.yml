@@ -1,12 +1,12 @@
 ---
-- import_tasks: setup_repo.yml
+- ansible.builtin.import_tasks: setup_repo.yml
 
 - name: Install package
   ansible.builtin.apt:
     name: "tempo={{ grafana_tempo_version }}"
     state: "present"
     allow_downgrade: true
-  
+
 - name: Install certificate key
   ansible.builtin.copy:
     mode: '0600'
@@ -16,7 +16,7 @@
     content: "{{ grafana_tempo_cert_key }}"
   when: grafana_tempo_cert_key is defined
 
-- name Install certificate file
+- name: Install certificate file
   ansible.builtin.copy:
     mode: '0600'
     owner: tempo
@@ -26,7 +26,7 @@
   when: grafana_tempo_cert_key is defined
 
 - name: Generate certificate
-  ansible.builtin.include_tasks: generate_certs.yml
+  ansible.builtin.include_tasks: generate_cert.yml
   vars:
     cert_key_path: /etc/tempo/cert.key
     cert_file_path: /etc/tempo/cert.file
@@ -38,13 +38,13 @@
   ansible.builtin.template:
     src: templates/tempo_config.yml.j2
     dest: /etc/tempo/config.yml
-    mode: 600
+    mode: '0600'
     owner: tempo
     group: nogroup
 
 - name: Start service
   ansible.builtin.systemd:
-    daemon-reload: yes
+    daemon-reload: true
     enabled: true
     state: started
     name: tempo.service
