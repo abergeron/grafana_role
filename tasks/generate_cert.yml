@@ -1,4 +1,8 @@
 ---
+- name: Install python dependecies
+  ansible.builtin.pip:
+    name: cryptography >= 1.2.3
+
 - name: Generate private key
   community.crypto.openssl_privatekey:
     path: "{{ cert_key_path | mandatory }}"
