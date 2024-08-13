@@ -1,2 +1,10 @@
 ---
+- name: Install Loki
+  ansible.builtin.include_tasks: install_loki.yml
+  when: grafana_install_loki
+
+- name: Install Tempo
+  ansible.builtin.include_tasks: install_tempo.yml
+  when: grafana_install_tempo
+
 # tasks file for grafana
