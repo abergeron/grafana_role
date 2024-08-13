@@ -1,13 +1,15 @@
 ---
 # defaults file for grafana
 
-grafana_loki_version: "2.9.5"
+grafana_install_loki: false
+grafana_loki_version: "3.1.1"
 grafana_loki_http_port: 3100
 grafana_loki_grpc_port: 9095
 grafana_loki_local_path: "/data/loki"
 # grafana_loki_cert_file:
 # grafana_loki_cert_key:
 
+grafana_install_tempo: false
 grafana_tempo_version: "2.4.0"
 grafana_tempo_http_port: 3200
 grafana_tempo_grpc_port: 9096
